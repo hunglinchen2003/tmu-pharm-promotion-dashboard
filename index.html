@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>北醫藥學院升等自評儀錶板</title>
+<style>
+  :root {
+    --bg: #f2eee6;
+    --ink: #1c2430;
+    --muted: #5c6570;
+    --card: #fffcf7;
+    --line: #e3d9c8;
+    --teal: #0f5e50;
+    --teal-d: #0a3f36;
+    --gold: #8a6116;
+    --red: #8d2e2e;
+    --ok: #1b7a45;
+    --wait: #8a6116;
+    --shadow: 0 10px 30px rgba(40, 32, 18, 0.06);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 400px at 10% -10%, #e7f3ef 0%, transparent 55%),
+      var(--bg);
+    font: 16px/1.55 "Segoe UI", "Microsoft JhengHei UI", "PingFang TC", sans-serif;
+  }
+  header.top {
+    padding: 28px 22px 12px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-family: Palatino, "Palatino Linotype", PMingLiU, serif;
+    font-weight: 600;
+    font-size: 32px;
+    letter-spacing: 0.02em;
+    margin: 0 0 6px;
+  }
+  .sub { color: var(--muted); margin: 0; max-width: 760px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 22px 64px; }
+  .sticky {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    backdrop-filter: blur(10px);
+    background: rgba(242, 238, 230, 0.92);
+    border-bottom: 1px solid var(--line);
+    margin: 8px 0 18px;
+  }
+  .verdict {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 12px 22px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .badge {
+    min-width: 92px;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .badge.ok { background: #e5f6ec; color: var(--ok); }
+  .badge.no { background: #fdecec; color: var(--red); }
+  .badge.wait { background: #f8f1df; color: var(--wait); }
+  .verdict p { margin: 0; }
+  .verdict strong { font-size: 18px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 16px; }
+  .tabs button, .row button, .tools button {
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font: inherit;
+  }
+  .tabs button[aria-selected="true"] {
+    background: var(--teal);
+    color: white;
+    border-color: var(--teal);
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  h2 { font-size: 20px; margin: 0 0 8px; }
+  h3 { font-size: 16px; margin: 16px 0 8px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+  label { display: block; font-size: 14px; margin: 8px 0 4px; }
+  input, select {
+    width: 100%;
+    font: inherit;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d9d0c2;
+    background: white;
+    color: var(--ink);
+  }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+  .fields .wide { grid-column: 1 / -1; }
+  .meter { height: 22px; background: #efe7da; border-radius: 999px; position: relative; overflow: hidden; margin: 10px 0 6px; }
+  .meter > span { display: block; height: 100%; background: linear-gradient(90deg, #c4554a, #0f5e50); width: 0; }
+  .tick {
+    position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink);
+  }
+  .tick em {
+    position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+    font-style: normal; font-size: 12px; white-space: nowrap; color: var(--muted);
+  }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .kpi { background: #f7f3ea; border-radius: 12px; padding: 10px 12px; }
+  .kpi b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .kpi span { color: var(--muted); font-size: 13px; }
+  ul.gaps { list-style: none; padding: 0; margin: 0; }
+  ul.gaps li {
+    display: grid;
+    grid-template-columns: 88px 1fr auto;
+    gap: 8px;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  ul.gaps li:last-child { border-bottom: 0; }
+  .tag { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+  .tag.ok { color: var(--ok); }
+  .tag.no { color: var(--red); }
+  .tag.wait { color: var(--wait); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .timeline .when { color: var(--muted); white-space: nowrap; }
+  .paper {
+    border: 1px dashed #d9d0c2;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 10px 0;
+    background: #fff;
+  }
+  .paper h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 14px; }
+  .checks label { display: flex; gap: 6px; align-items: center; margin: 0; }
+  .checks input { width: auto; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  footer.note { color: var(--muted); font-size: 13px; }
+  footer.note a { color: var(--teal-d); }
+  .now { background: #e7f3ef; }
+  @media (max-width: 860px) {
+    .grid, .fields, .kpis, .verdict { grid-template-columns: 1fr; }
+    ul.gaps li { grid-template-columns: 72px 1fr; }
+    ul.gaps li b { grid-column: 2; }
+  }
+  @media print {
+    .sticky, .tabs, .tools, button { display: none !important; }
+    .panel { display: block !important; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>北醫藥學院升等自評</h1>
+  <p class="sub">依藥學院教師評估準則、聘任升等細則，以及 115 學年度第 1 學期升等時程試算。分數只存在這台瀏覽器，不會上傳。</p>
+</header>
+<div class="sticky">
+  <div class="verdict">
+    <div id="badge" class="badge wait">待填</div>
+    <div>
+      <p><strong id="headline">先填近五年平均授課學分</strong></p>
+      <p id="subline" class="hint"></p>
+    </div>
+    <div id="creditBig" style="text-align:right"></div>
+  </div>
+</div>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="tab-overview" aria-selected="true">總覽</button>
+    <button type="button" role="tab" id="tab-time" aria-selected="false">時程</button>
+    <button type="button" role="tab" id="tab-teach" aria-selected="false">教學</button>
+    <button type="button" role="tab" id="tab-research" aria-selected="false">研究</button>
+    <button type="button" role="tab" id="tab-service" aria-selected="false">服務</button>
+  </div>
+
+  <section class="panel active" id="panel-overview">
+    <div class="grid">
+      <div class="card">
+        <h2>授課學分：必須超過同級平均</h2>
+        <p class="hint">專任教師的基本學分是學院「該職級前一學年度」平均實際授課學分。近五年平均要高於這個數字，打平不算過。未達時，教學學分分數＝50 ×（你的平均 ÷ 同級平均），上限 50。</p>
+        <div class="meter" id="meter" aria-hidden="true"><span id="meterFill"></span><i class="tick" id="meterTick"><em id="meterLabel"></em></i></div>
+        <div class="kpis" id="creditKpis"></div>
+        <div class="fields" style="margin-top:12px">
+          <div>
+            <label for="creditAvg">近五年平均實際授課學分</label>
+            <input id="creditAvg" type="number" min="0" step="0.01" placeholder="例如 9.50">
+          </div>
+          <div>
+            <label for="benchRank">拿來比較的同級</label>
+            <select id="benchRank">
+              <option value="助理教授">助理教授</option>
+              <option value="副教授">副教授</option>
+              <option value="教授">教授</option>
+            </select>
+          </div>
+          <div>
+            <label for="avgAsst">114 學年助理教授平均</label>
+            <input id="avgAsst" type="number" min="0" step="0.01" value="9.23">
+          </div>
+          <div>
+            <label for="avgAssoc">114 學年副教授平均</label>
+            <input id="avgAssoc" type="number" min="0" step="0.01" value="12.74">
+          </div>
+          <div>
+            <label for="avgProf">114 學年教授平均</label>
+            <input id="avgProf" type="number" min="0" step="0.01" value="9.03">
+          </div>
+          <div>
+            <label><input id="useSem" type="checkbox" style="width:auto"> 改由各學期計算平均</label>
+            <p class="hint">有填的學期才納入。整學期沒課請填 0；留職停薪請留空。</p>
+          </div>
+        </div>
+        <div id="semGrid" class="fields" hidden></div>
+      </div>
+      <div class="card">
+        <h2>達標還差多少</h2>
+        <ul class="gaps" id="gapList"></ul>
+      </div>
+    </div>
+    <div class="card">
+      <h2>身分與途徑</h2>
+      <div class="fields">
+        <div>
+          <label for="name">姓名</label>
+          <input id="name" value="陳宏霖" autocomplete="name">
+        </div>
+        <div>
+          <label for="appt">聘任</label>
+          <select id="appt">
+            <option value="專任">專任</option>
+            <option value="合聘專任">合聘專任</option>
+            <option value="兼任">兼任</option>
+            <option value="附醫">附屬醫院專任／醫療相關科部</option>
+          </select>
+        </div>
+        <div>
+          <label for="currentRank">原職級（同級）</label>
+          <select id="currentRank">
+            <option>講師</option>
+            <option selected>助理教授</option>
+            <option>副教授</option>
+            <option>教授</option>
+          </select>
+        </div>
+        <div>
+          <label for="targetRank">擬升職級</label>
+          <select id="targetRank">
+            <option>助理教授</option>
+            <option selected>副教授</option>
+            <option>教授</option>
+          </select>
+        </div>
+        <div>
+          <label for="track">學門</label>
+          <select id="track">
+            <option value="A">A 藥學院專兼任教師</option>
+            <option value="B">B 實習醫院或其他醫療機構臨床／醫事人員</option>
+            <option value="C">C 附屬醫院臨床藥師（至 115/9/30）</option>
+          </select>
+        </div>
+        <div>
+          <label for="path">升等途徑</label>
+          <select id="path">
+            <option value="academic">學術研發型（研究 60／教學 30／服務 10）</option>
+            <option value="teaching">教學實務型（研究 30／教學 60／服務 10）</option>
+          </select>
+        </div>
+        <div>
+          <label for="rankSince">現職級資格起算日</label>
+          <input id="rankSince" type="date">
+        </div>
+        <div>
+          <label for="schoolSince">到本校任職日</label>
+          <input id="schoolSince" type="date">
+        </div>
+        <div>
+          <label for="deadline">預計或實際申請截止日</label>
+          <input id="deadline" type="date" value="2026-04-30">
+        </div>
+        <div>
+          <label for="vote">院教評投票通過率（%）［還沒開會可留空］</label>
+          <input id="vote" type="number" min="0" max="100" step="0.1" placeholder="留空則只試算需要的通過率">
+        </div>
+      </div>
+      <p class="hint" id="windowNote"></p>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-time">
+    <div class="card">
+      <h2>115 學年度第 1 學期教師升等時程</h2>
+      <p class="hint">人資處公告目標是 115 年 10 月 31 日前完成報部發證。今天若已過 4 月 30 日，這一輪送件已截止；外審與複審仍可能在進行。下一學期時程尚未公告，可先用自訂截止日試算年資。</p>
+      <table class="timeline" id="timeline"></table>
+      <h3>這一輪著作採計區間</h3>
+      <p>自申請當學期起始日往前五年，到申請截止日。115-1 這輪人資處載明為 2021/2/1 至 2026/4/30。代表作若曾用於前一職級送審，不能再當這次代表作。</p>
+      <h3>外審門檻（著作送審）</h3>
+      <p>五位外審，至少四位及格。擬升教授或副教授，80 分及格；擬升助理教授 75 分。下面可填已收到的分數；留空不計入總判。</p>
+      <div class="fields" id="externalFields"></div>
+      <p id="externalResult"></p>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-teach">
+    <div class="card">
+      <h2>教學成績（上限 100，年輕學者加分後仍以 100 為限）</h2>
+      <p class="hint">教學、服務都要各別 ≥ 70，加權總分也要 ≥ 70，院教評才有機會往上送。授課學分另外還要超過同級平均。</p>
+      <div class="fields">
+        <div>
+          <label for="evalScore">近五年任教達 6 小時科目的評量平均（滿分約 5）</label>
+          <input id="evalScore" type="number" min="0" max="5" step="0.01" placeholder="4.50 以上得 10 分">
+        </div>
+        <div>
+          <label for="growthHours">近五年教師成長活動總時數</label>
+          <input id="growthHours" type="number" min="0" step="0.5" placeholder="每 2 小時 1 分，再取五年平均，上限 10">
+        </div>
+        <div>
+          <label for="innovBlocks">創新教學：每學期每滿 4 小時的次數</label>
+          <input id="innovBlocks" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="awardDept">系所級優良教師次數（每次 2 分）</label>
+          <input id="awardDept" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="awardCol">院級優良教師次數（每次 3 分）</label>
+          <input id="awardCol" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="awardUniv">校級優良教師或師鐸獎次數（每次 5 分）</label>
+          <input id="awardUniv" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="teachGrants">主持教育部教學實踐或國科會教育學門計畫件數（每件 5 分）</label>
+          <input id="teachGrants" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="schoolProj">參與教育部校級教學計畫的「項 × 學期」數（每次 2 分）</label>
+          <input id="schoolProj" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="studentAward">指導大專生／千里馬、論文比賽得獎或雙聯學位次數（每次 5 分）</label>
+          <input id="studentAward" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="emiCourses">EMI 主授門數 × 學期（每次 5 分）</label>
+          <input id="emiCourses" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="emiUg">EMI 大學部累計小時（每小時 1 分）</label>
+          <input id="emiUg" type="number" min="0" step="0.5" value="0">
+        </div>
+        <div>
+          <label for="emiGrad">EMI 研究所累計小時（每小時 0.5 分）</label>
+          <input id="emiGrad" type="number" min="0" step="0.5" value="0">
+        </div>
+      </div>
+      <div class="checks" style="margin-top:10px">
+        <label><input id="young" type="checkbox"> 國科會年輕學者養成計畫（教學、服務各加 40，加分後各以 100 為限）</label>
+      </div>
+      <p id="teachMath"></p>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-research">
+    <div class="card" id="academicBox">
+      <h2>學術研發研究積分</h2>
+      <p class="hint">論文分＝論文性質 C × 期刊 J × 作者序 A。最多採計分數最高的 15 篇。研究成績＝ min(100, 70 ×（論文＋專利技轉＋折抵）÷ 職級最低積分 ＋ 計畫件數 × 2）。折抵上限是最低積分的 30%。</p>
+      <div id="papers"></div>
+      <div class="tools">
+        <button type="button" id="addPaper">新增一篇論文</button>
+      </div>
+      <div class="fields" style="margin-top:12px">
+        <div>
+          <label for="patentPts">專利、技轉、衍生新創分數（已用計分要點算好）</label>
+          <input id="patentPts" type="number" min="0" step="0.1" value="0">
+        </div>
+        <div>
+          <label for="offsetPts">教學獎項、人體試驗、專書主編等折抵分</label>
+          <input id="offsetPts" type="number" min="0" step="0.1" value="0">
+        </div>
+        <div>
+          <label for="projects">可採計主持計畫件數（政府、結盟、國衛院；產學累計 50 萬最多視同 1 件）</label>
+          <input id="projects" type="number" min="0" step="1" value="0">
+        </div>
+        <div>
+          <label for="govProjects">其中政府機關或國衛院主持件數（升教授至少 1 件，不能用論文互抵掉）</label>
+          <input id="govProjects" type="number" min="0" step="1" value="0">
+        </div>
+      </div>
+      <p id="researchMath"></p>
+    </div>
+    <div class="card" id="teachingPathBox">
+      <h2>教學實務型研究積分</h2>
+      <p class="hint">最低積分：助理教授 250、副教授 350、教授 450。前三項合計要達最低積分的 30%。資格要先符合教學型教師、科部教學負責人，或院／校教學優良教師之一。</p>
+      <div class="checks">
+        <label><input id="tpTeacher" type="checkbox"> 曾任或現任教學型教師</label>
+        <label><input id="tpPd" type="checkbox"> 教學型主治醫師或 Program Director</label>
+        <label><input id="tpAward" type="checkbox"> 院級或校級教學優良教師</label>
+      </div>
+      <div class="fields">
+        <div><label for="tp1">教育／教學期刊論文分</label><input id="tp1" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp2">教育／教學專書分</label><input id="tp2" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp3">教學專業技術／實務報告分</label><input id="tp3" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp4">教育／教學投入貢獻分</label><input id="tp4" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp5">教育／教學獲獎分</label><input id="tp5" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp6">教育／教學推廣分</label><input id="tp6" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp7">其他領域論文及產學分</label><input id="tp7" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="tp8">產學實收金額折抵（上限 180）</label><input id="tp8" type="number" min="0" step="0.1" value="0"></div>
+        <div>
+          <label for="tpScore100">教學實務型研究成績（0–100，送進加權）</label>
+          <input id="tpScore100" type="number" min="0" max="100" step="0.1" placeholder="院評分表上的研究總分">
+        </div>
+      </div>
+      <p class="hint">條文有給學術研發型換成 100 分的公式，教學實務型的 100 分總分沒有公開換算式，所以加權用你填的研究成績；最低積分與否仍用上面八項加總判斷。</p>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-service">
+    <div class="card">
+      <h2>服務成績（上限 100）</h2>
+      <p class="hint">以前一職等期間的表現來計。院內服務、學生輔導、其他服務分開設上限。</p>
+      <div id="svcFull">
+        <h3>專任教師院內服務（上限 60）</h3>
+        <div class="fields">
+          <div><label for="adminYears">行政老師、院內主管或指定專案，成效優良的學年數（每年 10，上限 30）</label><input id="adminYears" type="number" min="0" step="1" value="0"></div>
+          <div><label for="committees">院內委員會委員職務項數（每項 2，上限 10）</label><input id="committees" type="number" min="0" step="1" value="0"></div>
+          <div><label for="activityYears">參與院系所活動或指導社團的學年數（每年 2，上限 20）</label><input id="activityYears" type="number" min="0" step="1" value="0"></div>
+        </div>
+      </div>
+      <div id="svcHosp">
+        <h3>附屬醫院服務（上限 60）</h3>
+        <div class="fields">
+          <div><label for="hospRole">主管或專科藥師年數（每年 10）</label><input id="hospRole" type="number" min="0" step="1" value="0"></div>
+          <div><label for="hospStaff">醫院專任工作年數（每年 8，與上一項合計上限 30）</label><input id="hospStaff" type="number" min="0" step="1" value="0"></div>
+          <div><label for="hospComm">醫院委員會年數（每年 2）</label><input id="hospComm" type="number" min="0" step="1" value="0"></div>
+          <div><label for="hospIntern">藥學實習指導的學期數（每學期 5，與委員會合計上限 20）</label><input id="hospIntern" type="number" min="0" step="1" value="0"></div>
+          <div><label for="hospEvents">參與醫院活動項數（每項 2，上限 10）</label><input id="hospEvents" type="number" min="0" step="1" value="0"></div>
+        </div>
+      </div>
+      <div id="svcPart">
+        <h3>兼任教師院內服務（上限 60）</h3>
+        <div class="fields">
+          <div><label for="pComm">委員會學年數（每年 5，上限 20）</label><input id="pComm" type="number" min="0" step="1" value="0"></div>
+          <div><label for="pEvents">院內活動項數（每項 5，上限 20）</label><input id="pEvents" type="number" min="0" step="1" value="0"></div>
+          <div><label for="pStudents">共同指導研究生的「人 × 學年」（每人每年 10，上限 20）</label><input id="pStudents" type="number" min="0" step="1" value="0"></div>
+        </div>
+      </div>
+      <h3>學生輔導（上限 20）</h3>
+      <div class="fields">
+        <div><label for="advisorSem">擔任導師學期數（每學期 3）</label><input id="advisorSem" type="number" min="0" step="1" value="0"></div>
+        <div><label for="clubItems">協助課外或社團且有紀錄的項數（每項 5）</label><input id="clubItems" type="number" min="0" step="1" value="0"></div>
+      </div>
+      <div class="checks">
+        <label><input id="counsel" type="checkbox"> 有具體輔導學生紀錄（5 分）</label>
+      </div>
+      <h3>其他校內外服務（上限 20）</h3>
+      <div class="fields">
+        <div><label for="otherCampus">校內其他服務的「項 × 學年」（每項每年 3，上限 10）</label><input id="otherCampus" type="number" min="0" step="1" value="0"></div>
+        <div><label for="outsidePts">校外服務自評（審查委員、學會、期刊編輯或審查，上限 10）</label><input id="outsidePts" type="number" min="0" max="10" step="0.5" value="0"></div>
+      </div>
+      <p id="serviceMath"></p>
+    </div>
+  </section>
+
+  <div class="card">
+    <h2>這次試算怎麼讀</h2>
+    <p class="hint">學術研發型升副教授，A 類研究積分要到 450，第一或通訊作者計權後至少 3 篇、主持計畫至少 2 件、國際合著至少 2 篇。JIF ≥ 6 算 2 篇、≥ 10 算 3 篇、≥ 20 算 5 篇。論文篇數和計畫件數可以互抵，本頁以 1 比 1 試算；升教授仍須另有 1 件政府或國衛院計畫。代表作：升副教授要單一第一或單一通訊，領域前 40% 或 JIF ≥ 3；同等貢獻不能當代表作，除非 JIF ≥ 10。有一篇 JIF ≥ 15 的單一第一或單一通訊正式論文，可免論文篇數、計畫、國際合著、代表作排名與研究積分門檻，教學和服務的 70 分不能免。</p>
+    <p class="hint">期刊 J：5-year JIF ≥ 8 或領域排名前 10% 先計 6 分，其後 20% 為 5、40% 為 4、60% 為 3、80% 為 2、其餘 1。若你手邊的計分表不同，把該篇改成手動 J。</p>
+    <div class="tools">
+      <button type="button" id="exportBtn">下載目前填答</button>
+      <button type="button" id="importBtn">讀回填答</button>
+      <button type="button" id="resetBtn">清空重填</button>
+      <input id="importFile" type="file" accept="application/json" hidden>
+    </div>
+    <footer class="note">
+      <p>依據：藥學院教師評估準則（111.5.13）、藥學院教師聘任升等細則（111.4.26）、校級教師升等計分標準施行要點、115 學年度第 1 學期升等時程。114 學年授課平均來自藥學院 2026/9/21 通知：教授 9.03、副教授 12.74、助理教授 9.23。這是自評工具，正式結果以院教評會與人力資源處為準。</p>
+      <p>法規頁：<a href="https://pharm.tmu.edu.tw/regulation/">藥學院辦法規章</a>　時程：<a href="https://tmu-hr.tmu.edu.tw/wp-content/uploads/2026/03/1151%E6%95%99%E5%B8%AB%E5%8D%87%E7%AD%89%E6%99%82%E7%A8%8B%E7%99%BC%E6%96%87%E7%89%88%E4%B8%AD%E8%8B%B1%E5%B0%8D%E7%85%A7.pdf">115-1 教師升等時程</a></p>
+    </footer>
+  </div>
+</div>
+<script>
+"use strict";
+const TODAY = new Date("2026-09-23T12:00:00+08:00");
+const KEY = "tmu-pharm-promo-v1";
+const SEMS = ["110-1","110-2","111-1","111-2","112-1","112-2","113-1","113-2","114-1","114-2"];
+const MINS = {
+  A: { 教授: 600, 副教授: 450, 助理教授: 300, 講師: 200 },
+  B: { 教授: 450, 副教授: 350, 助理教授: 250, 講師: 150 },
+  C: { 教授: 300, 副教授: 200, 助理教授: 150, 講師: 100 }
+};
+const TP_MIN = { 教授: 450, 副教授: 350, 助理教授: 250, 講師: 250 };
+const NEED = {
+  papers: { 教授: 5, 副教授: 3, 助理教授: 2, 講師: 0 },
+  plans: { 教授: 3, 副教授: 2, 助理教授: 0, 講師: 0 },
+  intl: { 教授: 3, 副教授: 2, 助理教授: 0, 講師: 0 },
+  series: { 教授: 3, 副教授: 2, 助理教授: 0, 講師: 0 },
+  years: { 教授: 3, 副教授: 3, 助理教授: 3, 講師: 0 }
+};
+const MILESTONES = [
+  ["送出申請並完成系統登錄", "2026-04-01", "2026-04-30", "申請人"],
+  ["系所主管填評估意見", "2026-05-01", "2026-05-07", "系所主管"],
+  ["教學實踐／產學小組審查（僅該類型）", "2026-05-08", "2026-05-31", "審查小組"],
+  ["公開演講與院級教評（非醫學院 6/18 前送人資）", "2026-05-08", "2026-07-10", "學院"],
+  ["校教評初審", "2026-07-01", "2026-07-31", "人力資源處"],
+  ["校外學術審查", "2026-08-01", "2026-09-30", "人力資源處"],
+  ["校教評複審", "2026-09-01", "2026-10-15", "人力資源處"],
+  ["報部發證", "2026-10-16", "2026-10-31", "人力資源處"]
+];
+
+const $ = (id) => document.getElementById(id);
+const n = (id) => {
+  const v = $(id).value;
+  if (v === "" || v == null) return null;
+  const x = Number(v);
+  return Number.isFinite(x) ? x : null;
+};
+const nz = (id) => n(id) ?? 0;
+const on = (id) => $(id).checked;
+function cap(x, m) { return Math.min(m, Math.max(0, x)); }
+function r1(x) { return Math.round(x * 10) / 10; }
+function r2(x) { return Math.round(x * 100) / 100; }
+function yearsBetween(a, b) {
+  if (!a || !b) return null;
+  const ms = new Date(b + "T12:00:00") - new Date(a + "T12:00:00");
+  return ms / (365.25 * 24 * 3600 * 1000);
+}
+function fmt(x) { return r2(x).toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1"); }
+
+function journalJ(p) {
+  if (p.jSource === "ei") return 1;
+  if (p.jSource === "other") return 0.5;
+  if (p.jSource === "manual") return p.jManual ?? 0;
+  const rank = p.rank;
+  const jif5 = p.jif5 ?? 0;
+  if (rank == null && jif5 < 8) return null;
+  if (jif5 >= 8 || (rank != null && rank <= 10)) return 6;
+  if (rank <= 20) return 5;
+  if (rank <= 40) return 4;
+  if (rank <= 60) return 3;
+  if (rank <= 80) return 2;
+  return 1;
+}
+function authorA(p, jif) {
+  let a = (p.pos <= 1 || p.corr) ? 5 : p.pos === 2 ? 3 : p.pos === 3 ? 1 : 0.5;
+  const k = p.equal;
+  if (k >= 2) {
+    let f = 0.3;
+    if (k === 2) f = jif >= 8 ? 1 : 0.9;
+    else if (k <= 4) f = jif >= 10 ? 1 : 0.6;
+    a *= f;
+    if (a < 0.5) a = 0.5;
+  }
+  return a;
+}
+function paperJif(p) { return Math.max(p.jif || 0, p.jif5 || 0); }
+function scorePaper(p) {
+  const C = { full: 3, short: 2, review: 2, case: 1 }[p.kind] || 0;
+  const J = journalJ(p);
+  if (J == null) return { points: null, C, J: null, A: null };
+  const jif = paperJif(p);
+  const A = authorA(p, jif);
+  return { points: C * J * A, C, J, A };
+}
+function weightCount(p) {
+  if (p.pos !== 1 && !p.corr) return 0;
+  const jif = paperJif(p);
+  if (jif >= 20) return 5;
+  if (jif >= 10) return 3;
+  if (jif >= 6) return 2;
+  return 1;
+}
+
+function readPapers() {
+  return [...document.querySelectorAll(".paper")].map((el) => ({
+    kind: el.querySelector(".kind").value,
+    jSource: el.querySelector(".jsrc").value,
+    rank: valOrNull(el.querySelector(".rank").value),
+    jif5: valOrNull(el.querySelector(".jif5").value),
+    jif: valOrNull(el.querySelector(".jif").value),
+    jManual: valOrNull(el.querySelector(".jman").value),
+    pos: Number(el.querySelector(".pos").value),
+    equal: Number(el.querySelector(".equal").value),
+    single: el.querySelector(".single").checked,
+    corr: el.querySelector(".corr").checked,
+    intl: el.querySelector(".intl").checked,
+    series: el.querySelector(".series").checked,
+    rep: el.querySelector(".rep").checked,
+    tmu: el.querySelector(".tmu").checked
+  }));
+}
+function valOrNull(v) {
+  if (v === "" || v == null) return null;
+  const x = Number(v);
+  return Number.isFinite(x) ? x : null;
+}
+
+function creditBlock() {
+  const appt = $("appt").value;
+  const benchRank = $("benchRank").value;
+  const avgs = { 助理教授: nz("avgAsst"), 副教授: nz("avgAssoc"), 教授: nz("avgProf") };
+  let avg = null;
+  if (on("useSem")) {
+    const vals = [...document.querySelectorAll(".sem")].map((el) => valOrNull(el.value)).filter((x) => x != null);
+    avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  } else {
+    avg = n("creditAvg");
+  }
+  let basic, rule;
+  if (appt === "合聘專任") { basic = 4; rule = "fixed"; }
+  else if (appt === "兼任") { basic = 2; rule = "fixed"; }
+  else { basic = avgs[benchRank] || avgs["助理教授"]; rule = "rank"; }
+  const filled = avg != null;
+  const exceed = filled && avg > basic;
+  const meet = filled && avg >= basic;
+  const points = !filled ? 0 : (meet ? 50 : 50 * (avg / basic));
+  const gap = !filled ? null : r2(basic - avg);
+  return { avg, basic, rule, benchRank, filled, exceed, meet, points: r2(points), gap, avgs };
+}
+
+function teachingBlock(creditPts) {
+  const evalScore = n("evalScore");
+  let evalPts = 0;
+  if (evalScore != null) {
+    if (evalScore >= 4.5) evalPts = 10;
+    else if (evalScore >= 4) evalPts = 9;
+    else if (evalScore >= 3.5) evalPts = 8;
+    else evalPts = 5;
+  }
+  const growth = cap((nz("growthHours") / 2) / 5, 10);
+  const innovRaw = nz("innovBlocks") * 2 + nz("awardDept") * 2 + nz("awardCol") * 3 + nz("awardUniv") * 5
+    + nz("teachGrants") * 5 + nz("schoolProj") * 2 + nz("studentAward") * 5
+    + nz("emiCourses") * 5 + nz("emiUg") + nz("emiGrad") * 0.5;
+  const innov = cap(innovRaw, 30);
+  const base = cap(creditPts + evalPts + growth + innov, 100);
+  const score = cap(base + (on("young") ? 40 : 0), 100);
+  return { evalScore, evalPts, growth: r2(growth), innov: r2(innov), innovRaw: r2(innovRaw), base: r2(base), score: r2(score), evalMissing: evalScore == null };
+}
+
+function serviceBlock() {
+  const appt = $("appt").value;
+  let inside = 0;
+  if (appt === "附醫") {
+    const lead = cap(nz("hospRole") * 10 + nz("hospStaff") * 8, 30);
+    const mid = cap(nz("hospComm") * 2 + nz("hospIntern") * 5, 20);
+    const ev = cap(nz("hospEvents") * 2, 10);
+    inside = cap(lead + mid + ev, 60);
+  } else if (appt === "兼任") {
+    inside = cap(cap(nz("pComm") * 5, 20) + cap(nz("pEvents") * 5, 20) + cap(nz("pStudents") * 10, 20), 60);
+  } else {
+    inside = cap(cap(nz("adminYears") * 10, 30) + cap(nz("committees") * 2, 10) + cap(nz("activityYears") * 2, 20), 60);
+  }
+  const student = cap(nz("advisorSem") * 3 + (on("counsel") ? 5 : 0) + nz("clubItems") * 5, 20);
+  const other = cap(cap(nz("otherCampus") * 3, 10) + cap(nz("outsidePts"), 10), 20);
+  const base = cap(inside + student + other, 100);
+  const score = cap(base + (on("young") ? 40 : 0), 100);
+  return { inside: r2(inside), student: r2(student), other: r2(other), base: r2(base), score: r2(score) };
+}
+
+function researchBlock() {
+  const papers = readPapers().filter(paperActive);
+  const scored = papers.map((p) => ({ ...p, ...scorePaper(p), w: weightCount(p) }));
+  const ranked = scored.filter((p) => p.points != null).sort((a, b) => b.points - a.points);
+  const top = ranked.slice(0, 15);
+  const paperPts = top.reduce((s, p) => s + p.points, 0);
+  const track = $("track").value;
+  const target = $("targetRank").value;
+  const minPts = MINS[track][target];
+  const offsetCap = minPts * 0.3;
+  const offset = Math.min(nz("offsetPts"), offsetCap);
+  const patent = nz("patentPts");
+  const numerator = paperPts + patent + offset;
+  const projects = nz("projects");
+  const score100 = cap(70 * (numerator / minPts) + projects * 2, 100);
+  const havePapers = scored.reduce((s, p) => s + p.w, 0);
+  const intl = scored.filter((p) => p.intl).length;
+  const series = scored.filter((p) => p.series).length;
+  const rep = scored.find((p) => p.rep) || null;
+  const tmuCount = scored.filter((p) => p.tmu).length;
+  const jif15 = scored.some((p) => p.rep && p.kind === "full" && p.single && (p.pos === 1 || p.corr) && paperJif(p) >= 15);
+  return { papers: scored, paperPts: r2(paperPts), offset: r2(offset), offsetCap, patent, numerator: r2(numerator), minPts, score100: r2(score100), havePapers, intl, series, rep, tmuCount, projects, gov: nz("govProjects"), jif15, incomplete: scored.some((p) => p.points == null) };
+}
+
+function paperActive(p) {
+  return p.rank != null || p.jif != null || p.jif5 != null || p.jManual != null
+    || p.intl || p.series || p.rep || p.corr
+    || p.kind !== "full" || p.pos !== 1 || p.equal !== 1 || p.jSource !== "rank" || p.single === false;
+}
+function repOk(rep, target, track) {
+  if (!rep) return { ok: false, why: "還沒指定代表作" };
+  if (rep.pos !== 1 && !rep.corr) return { ok: false, why: "代表作須為第一或通訊作者" };
+  const jif = paperJif(rep);
+  if (rep.equal >= 2 && jif < 10) return { ok: false, why: "同等貢獻不能當代表作，除非 JIF ≥ 10" };
+  if (track === "C") {
+    if (target === "教授" && !rep.corr) return { ok: false, why: "升教授代表作須為通訊作者" };
+    return { ok: true, why: "C 類不設領域排名門檻" };
+  }
+  if (target === "教授") {
+    if (!rep.corr) return { ok: false, why: "升教授代表作須為通訊作者" };
+    if (!rep.single && jif < 10) return { ok: false, why: "升教授代表作須為單一通訊；同等貢獻僅 JIF ≥ 10 可例外" };
+    if ((rep.rank != null && rep.rank <= 20) || jif >= 5 || jif >= 10) return { ok: true, why: "單一通訊，且領域前 20% 或 JIF ≥ 5" };
+    return { ok: false, why: "升教授代表作要領域前 20% 或 JIF ≥ 5" };
+  }
+  if (target === "副教授") {
+    if (!rep.single && jif < 10) return { ok: false, why: "升副教授代表作須為單一第一或單一通訊" };
+    if ((rep.rank != null && rep.rank <= 40) || jif >= 3) return { ok: true, why: "領域前 40% 或 JIF ≥ 3" };
+    return { ok: false, why: "升副教授代表作要領域前 40% 或 JIF ≥ 3" };
+  }
+  return { ok: true, why: "已指定第一或通訊作者代表作" };
+}
+
+function compute() {
+  const credit = creditBlock();
+  const teach = teachingBlock(credit.points);
+  const service = serviceBlock();
+  const path = $("path").value;
+  const research = researchBlock();
+  const target = $("targetRank").value;
+  const track = $("track").value;
+  const appt = $("appt").value;
+  let researchScore = research.score100;
+  let researchRaw = research.numerator;
+  let researchMin = research.minPts;
+  const tpItems = [nz("tp1"), nz("tp2"), nz("tp3"), nz("tp4"), nz("tp5"), nz("tp6"), nz("tp7"), Math.min(180, nz("tp8"))];
+  const tpSum = tpItems.reduce((a, b) => a + b, 0);
+  const tpHead = tpItems[0] + tpItems[1] + tpItems[2];
+  const tpMin = TP_MIN[target] || 350;
+  const tpEligible = on("tpTeacher") || on("tpPd") || on("tpAward");
+  if (path === "teaching") {
+    researchMin = tpMin;
+    researchRaw = tpSum;
+    researchScore = n("tpScore100");
+  }
+  const weights = path === "teaching" ? { t: 0.6, r: 0.3, s: 0.1 } : { t: 0.3, r: 0.6, s: 0.1 };
+  const weighted = researchScore == null ? null : r2(teach.score * weights.t + researchScore * weights.r + service.score * weights.s);
+  const gaps = [];
+  const add = (name, status, detail, distance) => gaps.push({ name, status, detail, distance });
+
+  if (!credit.filled) add("授課學分", "wait", "還沒填近五年平均", "請填平均學分");
+  else if (credit.rule === "rank" && !credit.exceed) {
+    const dist = credit.gap === 0 ? "已打平，還要再高於平均" : "還差 " + fmt(credit.gap) + " 學分";
+    add("授課學分", "no", "五年平均 " + fmt(credit.avg) + "，" + credit.benchRank + "平均 " + fmt(credit.basic) + "。教學學分目前 " + fmt(credit.points) + " / 50", dist);
+  } else if (credit.rule === "fixed" && !credit.meet) {
+    add("授課學分", "no", "平均 " + fmt(credit.avg) + "，基本 " + fmt(credit.basic) + " 學分", "還差 " + fmt(credit.basic - credit.avg) + " 學分");
+  } else {
+    const over = credit.avg - credit.basic;
+    add("授課學分", "ok", "已高於基準 " + fmt(over) + " 學分，教學學分 " + fmt(credit.points), "已超過 " + fmt(over) + " 學分");
+  }
+
+  if (teach.evalMissing) add("教學評量", "wait", "還沒填近五年評量平均", "請填評量");
+  add("教學成績", teach.score >= 70 ? "ok" : "no", "目前 " + fmt(teach.score) + " 分（學分 " + fmt(credit.points) + "、評量 " + teach.evalPts + "、成長 " + fmt(teach.growth) + "、創新 " + fmt(teach.innov) + "）", teach.score >= 70 ? "已達 70" : "還差 " + fmt(70 - teach.score) + " 分");
+  add("服務成績", service.score >= 70 ? "ok" : "no", "院內 " + fmt(service.inside) + "、輔導 " + fmt(service.student) + "、其他 " + fmt(service.other) + (on("young") ? "，含年輕學者加分" : ""), service.score >= 70 ? "已達 70" : "還差 " + fmt(70 - service.score) + " 分");
+
+  if (path === "academic") {
+    if (research.jif15) add("研究積分", "ok", "代表作 JIF ≥ 15 的單一第一或單一通訊正式論文，研究積分門檻依細則例外免除", "例外通過");
+    else add("研究積分", research.numerator + 1e-9 >= research.minPts ? "ok" : "no", "目前 " + fmt(research.numerator) + "／" + research.minPts + "（論文 " + fmt(research.paperPts) + "，專利技轉 " + fmt(research.patent) + "，折抵 " + fmt(research.offset) + "）", research.numerator >= research.minPts ? "已達最低積分" : "還差 " + fmt(research.minPts - research.numerator) + " 分");
+    const needP = NEED.papers[target];
+    const needG = NEED.plans[target];
+    const surplusP = Math.max(0, research.havePapers - needP);
+    const surplusG = Math.max(0, research.projects - needG);
+    const lackP = Math.max(0, needP - research.havePapers);
+    const lackG = Math.max(0, needG - research.projects);
+    const papersOk = research.jif15 || lackP <= surplusG;
+    const plansOk = research.jif15 || lackG <= surplusP;
+    add("論文篇數", papersOk ? "ok" : "no", "第一或通訊加權 " + fmt(research.havePapers) + " 篇，門檻 " + needP + " 篇" + (research.jif15 ? "（例外免除）" : "，可與計畫 1:1 互抵"), papersOk ? "篇數達標" : "還差 " + fmt(lackP - surplusG) + " 篇");
+    add("主持計畫", plansOk ? "ok" : "no", "可採計 " + research.projects + " 件，門檻 " + needG + " 件", plansOk ? "件數達標" : "還差 " + fmt(lackG - surplusP) + " 件");
+    if (target === "教授") add("政府計畫", research.gov >= 1 ? "ok" : "no", "政府或國衛院主持 " + research.gov + " 件", research.gov >= 1 ? "已有 1 件" : "還差 1 件");
+    if (track !== "C") {
+      const needI = NEED.intl[target];
+      const intlOk = research.jif15 || research.intl >= needI;
+      add("國際合著", intlOk ? "ok" : "no", "目前 " + research.intl + " 篇，門檻 " + needI + " 篇（不限第一作者）", intlOk ? "已達" : "還差 " + (needI - research.intl) + " 篇");
+    }
+    const needS = NEED.series[target];
+    const seriesOk = research.jif15 || needS === 0 || (research.series >= needS && research.rep && research.rep.series);
+    add("系列論文", seriesOk ? "ok" : "no", "系列論文 " + research.series + " 篇，門檻 " + needS + "，且代表作要在系列內", seriesOk ? "已達" : "還差系列論文或代表作未列入系列");
+    if (research.jif15) add("代表作", "ok", "JIF ≥ 15 單一第一或單一通訊正式論文", "例外通過");
+    else {
+      const rep = repOk(research.rep, target, track);
+      add("代表作", rep.ok ? "ok" : "no", rep.why, rep.ok ? "符合" : rep.why);
+    }
+    if (research.incomplete) add("論文計分", "wait", "有論文缺領域排名或 J，該篇尚未計分", "補排名或改手動 J");
+  } else {
+    add("教學實務資格", tpEligible ? "ok" : "no", "須為教學型教師、Program Director，或院／校教學優良教師", tpEligible ? "符合" : "三項都還沒勾");
+    add("教學實務積分", tpSum + 1e-9 >= tpMin ? "ok" : "no", "八項合計 " + fmt(tpSum) + "／" + tpMin, tpSum >= tpMin ? "已達" : "還差 " + fmt(tpMin - tpSum) + " 分");
+    const headNeed = tpMin * 0.3;
+    add("教學實務前三項", tpHead + 1e-9 >= headNeed ? "ok" : "no", "論文、專書、實務報告合計 " + fmt(tpHead) + "／" + fmt(headNeed), tpHead >= headNeed ? "已達 30%" : "還差 " + fmt(headNeed - tpHead) + " 分");
+    if (researchScore == null) add("研究成績", "wait", "教學實務型加權要用 0–100 的研究成績", "請填研究成績");
+  }
+
+  if (weighted == null) add("加權總分", "wait", "研究成績還沒齊，無法加總", "補研究成績");
+  else add("加權總分", weighted >= 70 ? "ok" : "no", "教學 " + Math.round(weights.t * 100) + "%、研究 " + Math.round(weights.r * 100) + "%、服務 " + Math.round(weights.s * 100) + "%，目前 " + fmt(weighted), weighted >= 70 ? "已達 70" : "還差 " + fmt(70 - weighted) + " 分");
+
+  const vote = n("vote");
+  if (weighted == null) add("院教評綜合", "wait", "先算出加權總分", "待研究成績");
+  else {
+    const needVote = r1(Math.max(0, 160 - weighted));
+    if (needVote > 100) add("院教評綜合", "no", "加權 " + fmt(weighted) + " 時，投票即使 100% 也達不到綜合 80", "加權至少要 60 分");
+    else if (vote == null) add("院教評綜合", "wait", "投票通過率至少要 " + fmt(needVote) + "%，綜合分才會到 80", "還需投票 ≥ " + fmt(needVote) + "%");
+    else {
+      const blend = r2(0.5 * vote + 0.5 * weighted);
+      add("院教評綜合", blend >= 80 ? "ok" : "no", "投票 " + fmt(vote) + "% 與加權各半，綜合 " + fmt(blend), blend >= 80 ? "已達 80" : "投票還要再 " + fmt(needVote - vote) + " 個百分點");
+    }
+  }
+
+  const deadline = $("deadline").value;
+  const yNeed = NEED.years[target];
+  const yHave = yearsBetween($("rankSince").value, deadline);
+  if (!deadline || !$("rankSince").value) add("現職年資", "wait", "升" + target + "原則要任現職 " + yNeed + " 年以上", "請填起算日與截止日");
+  else add("現職年資", yHave + 1e-9 >= yNeed ? "ok" : "no", "至截止日約 " + fmt(yHave) + " 年，門檻 " + yNeed + " 年", yHave >= yNeed ? "年資足夠" : "還差約 " + fmt(yNeed - yHave) + " 年");
+  const sNeed = appt === "兼任" ? 2 : 1;
+  const sHave = yearsBetween($("schoolSince").value, deadline);
+  if (!$("schoolSince").value || !deadline) add("本校年資", "wait", appt === "兼任" ? "兼任須滿 2 年" : "專任須滿 1 年", "請填到校日");
+  else add("本校年資", sHave >= sNeed ? "ok" : "no", "至截止日約 " + fmt(sHave) + " 年", sHave >= sNeed ? "已滿" : "還差約 " + fmt(sNeed - sHave) + " 年");
+  if (appt === "兼任") add("本校名義著作", research.tmuCount >= 3 ? "ok" : "no", "含代表作至少 3 篇", research.tmuCount >= 3 ? "已達 3 篇" : "還差 " + (3 - research.tmuCount) + " 篇");
+  else if (path === "academic" && research.papers.some((p) => !p.tmu)) add("本校名義", "wait", "專任在校期間著作應以本校名義發表，有論文未勾選", "請核對");
+
+  const hard = gaps.filter((g) => !["院教評綜合", "外審"].includes(g.name));
+  const fails = hard.filter((g) => g.status === "no");
+  const waits = hard.filter((g) => g.status === "wait");
+  let status = "ok";
+  if (fails.length) status = "no";
+  else if (waits.length) status = "wait";
+  return { credit, teach, service, research, researchScore, researchRaw, researchMin, weighted, weights, gaps, status, tpSum, tpHead, tpMin };
+}
+
+function renderPapers(list) {
+  const box = $("papers");
+  box.innerHTML = "";
+  (list || []).forEach((p, i) => box.appendChild(paperNode(p, i)));
+  if (!box.children.length) box.appendChild(paperNode({}, 0));
+}
+function paperNode(p, i) {
+  const el = document.createElement("div");
+  el.className = "paper";
+  el.innerHTML = `
+    <h3>論文 ${i + 1}<button type="button" class="del">移除</button></h3>
+    <div class="fields">
+      <div><label>性質</label><select class="kind">
+        <option value="full">正式論文 C=3</option>
+        <option value="short">簡報型 C=2</option>
+        <option value="review">綜論（一年一篇）C=2</option>
+        <option value="case">病例報告 C=1</option>
+      </select></div>
+      <div><label>期刊分數來源</label><select class="jsrc">
+        <option value="rank">SCIE／SSCI 依排名與 5-year JIF</option>
+        <option value="manual">手動 J</option>
+        <option value="ei">EI（J=1）</option>
+        <option value="other">其他非索引（J=0.5）</option>
+      </select></div>
+      <div><label>領域排名百分比（前 10% 填 10）</label><input class="rank" type="number" min="0" max="100" step="0.01"></div>
+      <div><label>5-year JIF</label><input class="jif5" type="number" min="0" step="0.001"></div>
+      <div><label>最新 JIF（與 5-year 取高，用來算篇數與代表作）</label><input class="jif" type="number" min="0" step="0.001"></div>
+      <div><label>手動 J</label><input class="jman" type="number" min="0" step="0.1"></div>
+      <div><label>作者序</label><select class="pos">
+        <option value="1">第一或通訊（A=5，計入篇數）</option>
+        <option value="2">第二（A=3）</option>
+        <option value="3">第三（A=1）</option>
+        <option value="4">第四以後（A=0.5）</option>
+      </select></div>
+      <div><label>同等貢獻人數（沒有就選 1）</label><select class="equal">
+        <option value="1">1（無同等貢獻）</option>
+        <option value="2">2 人</option>
+        <option value="3">3–4 人</option>
+        <option value="5">5 人以上</option>
+      </select></div>
+    </div>
+    <div class="checks">
+      <label><input class="single" type="checkbox" checked> 單一（沒有共同第一或共同通訊）</label>
+      <label><input class="corr" type="checkbox"> 通訊作者</label>
+      <label><input class="intl" type="checkbox"> 國際合著</label>
+      <label><input class="series" type="checkbox"> 系列論文</label>
+      <label><input class="rep" type="checkbox"> 代表作</label>
+      <label><input class="tmu" type="checkbox" checked> 本校名義</label>
+    </div>
+    <p class="hint scoreline"></p>`;
+  const set = (sel, val) => { if (val != null && val !== "") el.querySelector(sel).value = val; };
+  set(".kind", p.kind); set(".jsrc", p.jSource); set(".rank", p.rank); set(".jif5", p.jif5);
+  set(".jif", p.jif); set(".jman", p.jManual); set(".pos", p.pos); set(".equal", p.equal);
+  if (p.single != null) el.querySelector(".single").checked = !!p.single;
+  el.querySelector(".corr").checked = !!p.corr;
+  el.querySelector(".intl").checked = !!p.intl;
+  el.querySelector(".series").checked = !!p.series;
+  el.querySelector(".rep").checked = !!p.rep;
+  if (p.tmu != null) el.querySelector(".tmu").checked = !!p.tmu;
+  el.querySelector(".del").onclick = () => { el.remove(); renumber(); recalc(); };
+  return el;
+}
+function renumber() {
+  document.querySelectorAll(".paper h3").forEach((h, i) => {
+    h.firstChild.textContent = "論文 " + (i + 1);
+  });
+}
+
+function paint() {
+  const out = compute();
+  const badge = $("badge");
+  badge.className = "badge " + (out.status === "ok" ? "ok" : out.status === "no" ? "no" : "wait");
+  badge.textContent = out.status === "ok" ? "達標" : out.status === "no" ? "未達標" : "待補";
+  const c = out.credit;
+  if (!c.filled) {
+    $("headline").textContent = "授課學分還沒填，無法判斷有沒有超過同級平均";
+    $("subline").textContent = c.rule === "rank"
+      ? "現在的門檻是" + c.benchRank + "平均 " + fmt(c.basic) + " 學分，你的五年平均要高於它。"
+      : "基本授課學分是 " + fmt(c.basic) + "。";
+  } else if (c.rule === "rank" && !c.exceed) {
+    $("headline").textContent = c.gap === 0
+      ? "授課學分與" + c.benchRank + "平均打平，還沒有超過"
+      : "授課還差 " + fmt(c.gap) + " 學分，才超過" + c.benchRank + "平均";
+    $("subline").textContent = "五年平均 " + fmt(c.avg) + "，同級平均 " + fmt(c.basic) + "。未超過時教學學分是 " + fmt(c.points) + " 分，超過後這項才是 50 分。";
+  } else if (c.rule === "fixed" && !c.meet) {
+    $("headline").textContent = "授課還差 " + fmt(c.basic - c.avg) + " 學分";
+    $("subline").textContent = "這類聘任的基本學分是 " + fmt(c.basic) + "，不是學院職級平均。";
+  } else {
+    $("headline").textContent = "授課已超過基準 " + fmt(c.avg - c.basic) + " 學分";
+    $("subline").textContent = out.status === "ok"
+      ? "目前填入的硬性項目都已達標。院教評投票與外審若還沒發生，不在這個綠燈裡。"
+      : "授課這關過了，下面還有未達標或待補的項目。";
+  }
+  $("creditBig").innerHTML = c.filled
+    ? "<b style='font-size:28px'>" + fmt(c.avg) + "</b><div class='hint'>五年平均／門檻 " + fmt(c.basic) + "</div>"
+    : "";
+
+  const scale = Math.max(c.basic || 1, c.avg || 0, 1) * 1.2;
+  const pct = c.filled ? Math.max(0, Math.min(100, (c.avg / scale) * 100)) : 0;
+  $("meterFill").style.width = pct + "%";
+  const tickAt = ((c.basic || 0) / scale) * 100;
+  $("meterTick").style.left = tickAt + "%";
+  $("meterLabel").textContent = "門檻 " + fmt(c.basic || 0);
+  $("creditKpis").innerHTML = [
+    ["你的平均", c.filled ? fmt(c.avg) : "—"],
+    ["同級門檻", fmt(c.basic || 0)],
+    ["還差", !c.filled ? "—" : (c.avg > c.basic ? "已超 " + fmt(c.avg - c.basic) : (c.gap === 0 ? "須再高出" : fmt(c.gap)))]
+  ].map(([k, v]) => "<div class='kpi'><span>" + k + "</span><b>" + v + "</b></div>").join("");
+
+  $("gapList").innerHTML = out.gaps.map((g) =>
+    "<li><span class='tag " + g.status + "'>" + (g.status === "ok" ? "達標" : g.status === "no" ? "未達" : "待補") + "</span><span>" + g.name + "　" + g.detail + "</span><b>" + g.distance + "</b></li>"
+  ).join("");
+
+  $("teachMath").textContent = "教學學分 " + fmt(c.points) + " ＋ 評量 " + out.teach.evalPts + " ＋ 成長 " + fmt(out.teach.growth) + " ＋ 創新 " + fmt(out.teach.innov) + "（原始 " + fmt(out.teach.innovRaw) + "，上限 30）＝ 基礎 " + fmt(out.teach.base) + (on("young") ? "，年輕學者加分後 " : "，成績 ") + fmt(out.teach.score) + "。距離 70 分：" + (out.teach.score >= 70 ? "已到" : "還差 " + fmt(70 - out.teach.score));
+  if ($("path").value === "academic") {
+    $("researchMath").textContent = "採計論文 " + fmt(out.research.paperPts) + " 分（最高 15 篇），加專利技轉與折抵後分子 " + fmt(out.research.numerator) + "，最低標準 " + out.research.minPts + "。研究成績 " + fmt(out.research.score100) + "。加權總分 " + (out.weighted == null ? "尚缺資料" : fmt(out.weighted)) + "。";
+    document.querySelectorAll(".paper").forEach((el) => {
+      const p = readPapers().find((_, idx) => document.querySelectorAll(".paper")[idx] === el);
+      const s = scorePaper(p);
+      el.querySelector(".scoreline").textContent = s.points == null
+        ? "這篇還沒計分：請填領域排名，或 5-year JIF ≥ 8，或改手動 J。"
+        : "C " + s.C + " × J " + s.J + " × A " + r2(s.A) + " ＝ " + fmt(s.points) + " 分；篇數權重 " + weightCount(p);
+    });
+  }
+  $("serviceMath").textContent = "院內 " + fmt(out.service.inside) + " ＋ 輔導 " + fmt(out.service.student) + " ＋ 其他 " + fmt(out.service.other) + " ＝ " + fmt(out.service.base) + (on("young") ? "，加分後 " : "，成績 ") + fmt(out.service.score) + "。距離 70 分：" + (out.service.score >= 70 ? "已到" : "還差 " + fmt(70 - out.service.score));
+
+  const dl = $("deadline").value;
+  $("windowNote").textContent = dl
+    ? "年資計算到 " + dl + "。115-1 著作區間依公告為 2021/2/1–2026/4/30。若改填下一梯次截止日，年資會跟著重算；著作區間請再對人資處當學期起始日。"
+    : "填了申請截止日之後，才核對現職滿三年與本校任職年資。";
+
+  $("academicBox").hidden = $("path").value !== "academic";
+  $("teachingPathBox").hidden = $("path").value !== "teaching";
+  $("svcFull").hidden = $("appt").value === "兼任" || $("appt").value === "附醫";
+  $("svcHosp").hidden = $("appt").value !== "附醫";
+  $("svcPart").hidden = $("appt").value !== "兼任";
+  $("semGrid").hidden = !on("useSem");
+  paintExternal();
+  paintTimeline();
+}
+
+function paintTimeline() {
+  const rows = MILESTONES.map(([name, a, b, who]) => {
+    const start = new Date(a + "T00:00:00+08:00");
+    const end = new Date(b + "T23:59:59+08:00");
+    let st = "尚未開始";
+    let cls = "";
+    if (TODAY > end) st = "已過";
+    else if (TODAY >= start) { st = "進行中"; cls = "now"; }
+    const days = Math.ceil((end - TODAY) / 86400000);
+    const left = TODAY > end ? "" : (TODAY >= start ? "，還有 " + days + " 天" : "，" + Math.ceil((start - TODAY) / 86400000) + " 天後開始");
+    return "<tr class='" + cls + "'><td>" + name + "</td><td class='when'>" + a + " – " + b + "</td><td>" + who + "</td><td>" + st + left + "</td></tr>";
+  }).join("");
+  $("timeline").innerHTML = "<thead><tr><th>項目</th><th>日期</th><th>負責</th><th>狀態</th></tr></thead><tbody>" + rows + "</tbody>";
+}
+function paintExternal() {
+  const target = $("targetRank").value;
+  const bar = target === "助理教授" ? 75 : 80;
+  const scores = [...document.querySelectorAll(".ext")].map((el) => valOrNull(el.value));
+  const filled = scores.filter((x) => x != null);
+  const el = $("externalResult");
+  if (!filled.length) { el.textContent = "外審分數還沒填。及格線是 " + bar + " 分，五位裡要有四位達線。"; return; }
+  const pass = filled.filter((x) => x >= bar).length;
+  el.textContent = "已填 " + filled.length + " 位，達 " + bar + " 分的有 " + pass + " 位。著作送審要 5 位中至少 4 位及格。" + (filled.length === 5 ? (pass >= 4 ? " 以目前分數，外審人數達標。" : " 還差 " + (4 - pass) + " 位及格。") : " 尚未滿 5 位。");
+}
+
+let paperSeq = 1;
+function snapshot() {
+  return {
+    fields: [...document.querySelectorAll("input, select")].filter((el) => el.id).map((el) => [el.id, el.type === "checkbox" ? el.checked : el.value]),
+    sems: [...document.querySelectorAll(".sem")].map((el) => el.value),
+    papers: readPapers(),
+    ext: [...document.querySelectorAll(".ext")].map((el) => el.value)
+  };
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(snapshot())); }
+function recalc() { paint(); save(); }
+
+function setupSem() {
+  $("semGrid").innerHTML = SEMS.map((s) => "<div><label>" + s + " 實際學分</label><input class='sem' data-sem='" + s + "' type='number' min='0' step='0.01'></div>").join("");
+}
+function setupExt() {
+  $("externalFields").innerHTML = [1, 2, 3, 4, 5].map((i) => "<div><label>外審 " + i + "</label><input class='ext' type='number' min='0' max='100' step='0.1'></div>").join("");
+}
+function bind() {
+  document.body.addEventListener("input", (e) => {
+    if (e.target && (e.target.matches("input, select") || e.target.closest(".paper"))) recalc();
+  });
+  document.body.addEventListener("change", (e) => {
+    if (e.target && e.target.matches("input, select")) recalc();
+  });
+  $("currentRank").addEventListener("change", () => {
+    const v = $("currentRank").value;
+    if (["助理教授", "副教授", "教授"].includes(v)) $("benchRank").value = v;
+    recalc();
+  });
+  $("addPaper").onclick = () => {
+    $("papers").appendChild(paperNode({}, document.querySelectorAll(".paper").length));
+    recalc();
+  };
+  document.querySelectorAll(".tabs button").forEach((btn) => {
+    btn.onclick = () => {
+      document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-selected", "false"));
+      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+      btn.setAttribute("aria-selected", "true");
+      $("panel-" + btn.id.slice(4)).classList.add("active");
+    };
+  });
+  $("exportBtn").onclick = () => {
+    const blob = new Blob([JSON.stringify(snapshot(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "promotion-self-check.json";
+    a.click();
+  };
+  $("importBtn").onclick = () => $("importFile").click();
+  $("importFile").onchange = () => {
+    const file = $("importFile").files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { applySnapshot(JSON.parse(reader.result)); };
+    reader.readAsText(file);
+  };
+  $("resetBtn").onclick = () => {
+    localStorage.removeItem(KEY);
+    location.reload();
+  };
+}
+function applySnapshot(data) {
+  if (!data) return;
+  (data.fields || []).forEach(([id, val]) => {
+    const el = $(id);
+    if (!el) return;
+    if (el.type === "checkbox") el.checked = !!val;
+    else el.value = val;
+  });
+  (data.sems || []).forEach((v, i) => {
+    const el = document.querySelectorAll(".sem")[i];
+    if (el) el.value = v;
+  });
+  (data.ext || []).forEach((v, i) => {
+    const el = document.querySelectorAll(".ext")[i];
+    if (el) el.value = v;
+  });
+  if (data.papers) renderPapers(data.papers);
+  recalc();
+}
+
+setupSem();
+setupExt();
+renderPapers([{}]);
+bind();
+applySnapshot(JSON.parse(localStorage.getItem(KEY) || "null"));
+if (!localStorage.getItem(KEY)) recalc();
+window.Promo = { compute, journalJ, scorePaper };
+</script>
+</body>
+</html>
